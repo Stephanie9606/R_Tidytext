@@ -44,19 +44,19 @@ t_questSF <- gutenberg_download(15265)
 - The function must remove any front matter (words before Chapter 1)
 - The function can consider the unique nature of the front matter but cannot consider exactly how many chapters are in each book based on looking at the data i.e., no math based on knowing the number of chapters. 
 ```{r}
-booktodf <- function(x){
+tidybook <- function(x){
   x %>% 
-    tibble(
-      line = 1:length(x),
-      text = text()
-    ) %>% 
-    unnest_tokens(word, text) %>%        # unnest tokens at the word level
     mutate(linenumber = row_number(),    # add line and chapter numbers as variables
            chapter = cumsum(str_detect(text,
                                        regex("^chapter [\\divxlc]",
                                              ignore_case = TRUE)))) %>% 
+    unnest_tokens(word, text) %>%        # unnest tokens at the word level
     mutate(word = str_extract(word, "[a-z]+")) %>% # only the words remain
-    anti_join(stop_words, by = "word")             # filter out stop_words and any `NA`s
+    anti_join(stop_words, by = "word") %>%         # filter out stop_words and any `NA`s
+    filter(!is.na(word)) %>% 
+    filter(chapter > 0) ->                         # remove any front matter
+    y
+  y
 }
 ```
 
