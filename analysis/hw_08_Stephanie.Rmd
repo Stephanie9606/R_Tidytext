@@ -16,29 +16,25 @@ knitr::opts_chunk$set(fig.align  = "center",
                       fig.width  = 6)
 ```
 
-# Instructions {-}
-1. Clone this homework repo to your homework directory as a new repo.
-2. Rename the starter file under the analysis directory as `hw_01_yourname.Rmd` and use it for your solutions.   
-3. Modify the "author" field in the YAML header.  
-4. Stage and Commit R Markdown and HTML files (no PDF files).   
-5. **Push both .Rmd and HTML files to GitHub**.   
-- Make sure you have knitted to HTML prior to staging, committing, and pushing your final submission.  
-6. **Commit each time you answer a part of question, e.g. 1.1**   
-7. **Push to GitHub after each major question**   
-8. When complete, submit a response in Canvas  
-
-- Only include necessary code to answer the questions.
-- Most of the functions you use should be from the tidyverse. 
-- Unnecessary Base R or other packages not covered in class will result in point deductions.
-- Use Pull requests and or email to ask me any questions. If you email, please ensure your most recent code is pushed to GitHub.
-
-
 # Sentiment Analysis
 
 1. Download the following two works from the early 20^th^ century from Project Gutenberg:
 - Upton Sinclair: "*The Jungle*" (1906)
 - W.E.B. Du Bois: "*The Quest of the Silver Fleece*" (1911)
-  
+```{r}
+library(tidyverse)
+library(tidytext)
+library(gutenbergr)
+
+gutenberg_works() %>% 
+  filter(str_detect(title, "The Jungle")) # get id 140
+
+gutenberg_works() %>% 
+  filter(str_detect(title, "The Quest of the Silver Fleece")) # get id 15265
+
+t_jungle <- gutenberg_download(140)
+t_questSF <- gutenberg_download(15265)
+```
 
 2. Write a function `to take an argument of a downloaded book tibble and return it in tidy text format.
 - The function must add line and chapter numbers as variables
@@ -47,7 +43,22 @@ knitr::opts_chunk$set(fig.align  = "center",
 - The function must remove any stop_words and filter out any `NA`s
 - The function must remove any front matter (words before Chapter 1)
 - The function can consider the unique nature of the front matter but cannot consider exactly how many chapters are in each book based on looking at the data i.e., no math based on knowing the number of chapters. 
-   
+```{r}
+booktodf <- function(x){
+  x %>% 
+    tibble(
+      line = 1:length(x),
+      text = text()
+    ) %>% 
+    unnest_tokens(word, text) %>%        # unnest tokens at the word level
+    mutate(linenumber = row_number(),    # add line and chapter numbers as variables
+           chapter = cumsum(str_detect(text,
+                                       regex("^chapter [\\divxlc]",
+                                             ignore_case = TRUE)))) %>% 
+    mutate(word = str_extract(word, "[a-z]+")) %>% # only the words remain
+    anti_join(stop_words, by = "word")             # filter out stop_words and any `NA`s
+}
+```
 
 3. Use the function from step 2
 - Tidy each book and then add `book` and `author` as variables and save each tibble to a new variable. How many rows are in each book?
