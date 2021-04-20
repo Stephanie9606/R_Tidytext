@@ -148,10 +148,9 @@ books_bing_count %>%
 - Ensure each facet has the words in the proper order for that book.
 - Identify any that may be inappropriate for the context of the book and should be excluded from the sentiment analysis.
 ```{r}
-# positive
 books_bing_count %>%
   group_by(book, sentiment) %>% 
-  slice_max(order_by = n, n=10) %>% 
+  slice_max(order_by = n, n = 10) %>% 
   ungroup() %>% 
   mutate(word = reorder_within(word, n, book)) %>%
   ungroup() %>%
@@ -163,26 +162,48 @@ books_bing_count %>%
   labs(y = "Contribution to sentiment",
        x = NULL) +
   coord_flip()
+# "miss" may be inappropriate for the context of the book
 ```
 
 9. Remove the inappropriate word(s) from the analysis.
 - Replot the top 10 for each sentiment per book from step 8.
 - Interpret the plots
 ```{r}
+# filter out miss
 get_sentiments("bing") %>%
   filter(word != "miss") ->
 bing_no_miss
 
+# no miss df
 twobooks_tidy %>% 
   inner_join(bing_no_miss, by = "word") %>% 
-  filter(sentiment == "positive") %>% 
-  group_by(book) %>% 
-  
+  group_by(book, word, sentiment) %>% 
+  count() ->
+  books_bing_nomiss
+
+books_bing_nomiss %>% 
+  group_by(book, sentiment) %>% 
+  slice_max(order_by = n, n = 10) %>% 
+  ungroup() %>% 
+  mutate(word = reorder_within(word, n, book)) %>%
+  ungroup() %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(sentiment ~book, scales = "free") +
+  scale_x_reordered() +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "Contribution to sentiment",
+       x = NULL) +
+  coord_flip()
+# Interpretation: "miss" may not be the negative word in the novel, it may refers to young lady, the new plot shows that "slowly" is the most common negative word in "The Quest" with understandable counts, since "miss" is over 400
 ```
 
 10. Rerun the analysis from step 5 and recreate the plot with the title "Custom Bing".
 - Show both the original step 5 plot with the new plot in the same output graphic, one on top of the other.
 - Interpret the plots
+```{r}
+
+```
 
 # tf-idf for Mark Twain's books
 
