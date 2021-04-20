@@ -147,10 +147,38 @@ books_bing_count %>%
 8. Plot the top ten for each positive and negative sentiment faceting by book.
 - Ensure each facet has the words in the proper order for that book.
 - Identify any that may be inappropriate for the context of the book and should be excluded from the sentiment analysis.
+```{r}
+# positive
+books_bing_count %>%
+  group_by(book, sentiment) %>% 
+  slice_max(order_by = n, n=10) %>% 
+  ungroup() %>% 
+  mutate(word = reorder_within(word, n, book)) %>%
+  ungroup() %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(sentiment ~book, scales = "free") +
+  scale_x_reordered() +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(y = "Contribution to sentiment",
+       x = NULL) +
+  coord_flip()
+```
 
 9. Remove the inappropriate word(s) from the analysis.
 - Replot the top 10 for each sentiment per book from step 8.
 - Interpret the plots
+```{r}
+get_sentiments("bing") %>%
+  filter(word != "miss") ->
+bing_no_miss
+
+twobooks_tidy %>% 
+  inner_join(bing_no_miss, by = "word") %>% 
+  filter(sentiment == "positive") %>% 
+  group_by(book) %>% 
+  
+```
 
 10. Rerun the analysis from step 5 and recreate the plot with the title "Custom Bing".
 - Show both the original step 5 plot with the new plot in the same output graphic, one on top of the other.
