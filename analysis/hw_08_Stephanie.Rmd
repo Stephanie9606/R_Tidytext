@@ -46,9 +46,11 @@ t_questSF <- gutenberg_download(15265)
 ```{r}
 tidybook <- function(x){
   x %>% 
+    mutate(text = str_replace(text, "_Contents_", "Contents"),
+         text = str_replace(text, "_Note_", "Note")) %>% 
     mutate(linenumber = row_number(),    # add line and chapter numbers as variables
            chapter = cumsum(str_detect(text,
-                                       regex("^chapter [\\divxlc]",
+                                       regex("^chapter [ivxlc]",
                                              ignore_case = TRUE)))) %>% 
     unnest_tokens(word, text) %>%        # unnest tokens at the word level
     mutate(word = str_extract(word, "[a-z]+")) %>% # only the words remain
@@ -58,10 +60,31 @@ tidybook <- function(x){
     y
   y
 }
+
+t_jungle %>% 
+    mutate(text = str_replace(text, "_Contents_", "Contents"),
+         text = str_replace(text, "_Note_", "Note")) %>% 
+    mutate(linenumber = row_number(),    # add line and chapter numbers as variables
+           chapter = cumsum(str_detect(text,
+                                       regex("^[_chapter][\\divxlc]",
+                                             ignore_case = TRUE))))
 ```
 
 3. Use the function from step 2
 - Tidy each book and then add `book` and `author` as variables and save each tibble to a new variable. How many rows are in each book?
+```{r}
+tidybook(t_jungle) %>% 
+  mutate(book = "The Jungle",
+         author = "Sinclair, Upton") ->
+  t_jungle_tidy
+nrow(t_jungle_tidy)
+
+tidybook(t_questSF) %>% 
+  mutate(book = "The Quest of the Silver Fleece: A Novel",
+         author = "Du Bois, W. E. B. (William Edward Burghardt)") ->
+  t_questSF_tidy
+nrow(t_questSF_tidy)
+```
 
 4. Use a dplyr function to combine the two tibbles into a new tibble. 
 - It should have 89,434 rows with 6 variables
