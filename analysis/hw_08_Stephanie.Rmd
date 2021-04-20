@@ -114,12 +114,35 @@ books_bing_plot
 - Interpret the plots for each book and then compare them. 
 - Why did the values drop off so suddenly at the end?
 ```{r}
+twobooks_tidy %>% 
+  inner_join(get_sentiments("nrc"), by = "word") %>% 
+  count(book, index = linenumber %/% 500, sentiment) %>% 
+  filter(sentiment == "negative")
 
+get_sentiments("nrc") %>% 
+  filter(sentiment == "positive")
 ```
 
 7. Using bing, create a new data frame with the counts of the positive and negative sentiment words for each book.
 - Show the "top 20" most frequent words across both books along with their book, sentiment, and count, in descending order by count.
 - What are the positive words in the list of "top 20"?
+```{r}
+# new df
+twobooks_tidy %>% 
+  inner_join(get_sentiments("bing"), by = "word") %>% 
+  group_by(book, word, sentiment) %>% 
+  count() ->
+  books_bing_count
+# "top 20" most frequent words across both books
+books_bing_count %>% 
+  arrange(desc(n)) %>% 
+  head(20)
+# positive words in the list of "top 20"?
+books_bing_count %>% 
+  arrange(desc(n)) %>% 
+  head(20) %>% 
+  filter(sentiment == "positive")
+```
 
 8. Plot the top ten for each positive and negative sentiment faceting by book.
 - Ensure each facet has the words in the proper order for that book.
