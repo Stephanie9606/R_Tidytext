@@ -116,7 +116,7 @@ books_bing_plot
 ```{r}
 twobooks_tidy %>% 
   inner_join(get_sentiments("nrc"), by = "word") %>% 
-  count(book, index = linenumber %/% 500, sentiment) %>% 
+  count(book, index = linenumber %/% 500, sentiment, book, sort = TRUE) %>% 
   filter(!(sentiment == "negative" | sentiment == "positive")) ->
   nrc_no_posneg # 464
 
@@ -133,8 +133,8 @@ nrc_no_posneg %>%
 # new df
 twobooks_tidy %>% 
   inner_join(get_sentiments("bing"), by = "word") %>% 
-  group_by(book, word, sentiment) %>% 
-  count() ->
+  count(book, word, sentiment, sort = TRUE) %>% 
+  ungroup() ->
   books_bing_count
 # "top 20" most frequent words across both books
 books_bing_count %>% 
