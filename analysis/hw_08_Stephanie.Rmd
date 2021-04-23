@@ -298,7 +298,10 @@ mtsbooks_tfidf %>%
 - Only show those rows.
 - How many look like possible names?
 ```{r}
-
+mtsbooks_tfidf %>% 
+  arrange(desc(tf_idf)) %>% 
+  slice(1:15)
+# it seems like most of them are names except: prince, warn't, didn't, don't, ain, pilots and ain't
 ```
    
 6.  Plot the top 7 tf_idf words from each book.
