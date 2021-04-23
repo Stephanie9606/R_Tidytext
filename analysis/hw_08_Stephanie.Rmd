@@ -242,10 +242,8 @@ grid.arrange(p1, p2, nrow=2)
 - *Huckleberry Finn*,  *Tom Sawyer* , *Connecticut Yankee in King Arthur's Court*, *Life on the Mississippi* , *Prince and the Pauper*,  and *A Tramp Abroad* 
 ```{r}
 gutenberg_works() %>% 
-  filter(str_detect(title, c("Huckleberry Finn", "Tom Sawyer", "Connecticut Yankee in King Arthur's Court", "Life on the Mississippi", "Prince and the Pauper", "A Tramp Abroad"))) ->
-  mtsbook
-mtsid <- mtsbook$gutenberg_id # store ids
-mtsbooks_df <- gutenberg_download(mtsid, meta_fields = "title") # download the books
+  filter(str_detect(author, "Twain")) # get ids: 74, 76, 86, 119, 245, 1837
+mtsbooks_df <- gutenberg_download(c(74, 76, 86, 119, 245, 1837), meta_fields = "title") # download the books
 ```
 
 2. Modify your earlier function or create a new one to output a tf-idf ready dataframe (**leave the the stop words in the text**)
@@ -255,13 +253,9 @@ mtsbooks_df <- gutenberg_download(mtsid, meta_fields = "title") # download the b
 ```{r}
 to_tfidf <- function(x){
   x %>% 
-    mutate(linenumber = row_number(),               # add line and chapter numbers as variables
-           chapter = cumsum(str_detect(text,
-                                       regex("^chapter [ivxlc]",
-                                             ignore_case = TRUE)))) %>% 
     unnest_tokens(word, text) %>%                   # unnest tokens at the word level
     mutate(word = str_extract(word, "[a-z']+")) %>% # only the words remain
-    filter(chapter != 0) %>%                        # remove any front matter
+    drop_na() %>% 
     count(title, word, sort = TRUE) ->
     y
   
@@ -273,29 +267,9 @@ to_tfidf <- function(x){
   y %>% 
     left_join(total_words, by = "title") ->
     y
-  
-  y %>% 
-    bind_tf_idf(word, title, n) ->
-    y
   y
 }
 to_tfidf(mtsbooks_df)
-
-mtsbooks_df %>% 
-  unnest_tokens(word, text) %>%     # unnest tokens at the word level
-  mutate(word = str_extract(word, "[a-z']+")) %>% # only the words remain
-  drop_na() %>% 
-  count(title, word, sort = TRUE) ->
-  tempdf
-tempdf %>% 
-  group_by(title) %>% 
-    summarise(total = sum(n), .groups = "keep") ->
-    total_words
-tempdf %>% 
-    left_join(total_words, by = "title") ->
-    tempdf
-tempdf %>% 
-    bind_tf_idf(word, title, n)
 ```
 
 3. Calculate the tf-idf
