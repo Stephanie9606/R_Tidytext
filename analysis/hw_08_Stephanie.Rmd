@@ -292,7 +292,7 @@ mtsbooks_tfidf %>%
 mtsbooks_tfidf %>% 
   arrange(desc(tf_idf)) %>% 
   slice(1:15)
-# it seems like most of them are names except: prince, warn't, didn't, don't, ain, pilots and ain't
+# It seems like most of them are names except: prince, warn't, didn't, don't, ain, pilots and ain't
 ```
    
 6.  Plot the top 7 tf_idf words from each book.
@@ -309,6 +309,7 @@ mtsbooks_tfidf %>%
   labs(x = NULL, y = "tf-idf") +
   facet_wrap(~title, ncol = 2, scales = "free") +
   coord_flip()
+# Interpretation: Most of the top tf_idf words are names, some are stop words
 ```
 
 # Extra Credit Podcasts
