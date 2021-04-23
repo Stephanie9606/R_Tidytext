@@ -269,11 +269,17 @@ to_tfidf <- function(x){
     y
   y
 }
-to_tfidf(mtsbooks_df)
+to_tfidf(mtsbooks_df) ->
+  mtsbooks_tfidf
 ```
 
 3. Calculate the tf-idf
 - Save back to the data frame.
+```{r}
+mtsbooks_tfidf %>% 
+  bind_tf_idf(word, total, n) ->
+  mtsbooks_tfidf
+```
 
 4. Plot the tf for each book using a faceted graph.
 - Facet by book and constrain the data or the X axis to see the shape of the distribution.
