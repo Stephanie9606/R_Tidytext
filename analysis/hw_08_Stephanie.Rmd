@@ -124,6 +124,7 @@ nrc_no_posneg %>%
   ggplot(aes(x = index, y = n, fill = sentiment)) + 
   geom_col(show.legend = F) +
   facet_grid(~book)
+# Interpretation: It seems like both books have similar sentiment structures through out each block, the suddenly drop off could be the short ending in "The Jungle"
 ```
 
 7. Using bing, create a new data frame with the counts of the positive and negative sentiment words for each book.
