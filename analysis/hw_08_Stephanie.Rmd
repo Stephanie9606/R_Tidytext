@@ -292,7 +292,7 @@ mtsbooks_tfidf %>%
 mtsbooks_tfidf %>% 
   arrange(desc(tf_idf)) %>% 
   slice(1:15)
-# It seems like most of them are names except: prince, warn't, didn't, don't, ain, pilots and ain't
+# It seems like possible names will be Hendon, Becky, Huck, Canty, Joe
 ```
    
 6.  Plot the top 7 tf_idf words from each book.
