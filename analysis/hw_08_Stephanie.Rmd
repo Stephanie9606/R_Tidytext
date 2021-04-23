@@ -283,10 +283,23 @@ mtsbooks_tfidf %>%
 
 4. Plot the tf for each book using a faceted graph.
 - Facet by book and constrain the data or the X axis to see the shape of the distribution.
-   
+```{r}
+mtsbooks_tfidf %>%
+  mutate(rank = row_number()) %>% 
+  ggplot(aes(rank, tf)) + 
+  # geom_abline(intercept = -0.62, slope = -1.1, color = "red", linetype = 2) +
+  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
+  facet_wrap(~title, scales = "free_y") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
 5. Show the words with the 15 highest tf-idfs across across all books
 - Only show those rows.
 - How many look like possible names?
+```{r}
+
+```
    
 6.  Plot the top 7 tf_idf words from each book.
 - Sort in descending order of tf_idf
