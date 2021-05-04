@@ -1,3 +1,3 @@
 # Rtidytext
 
-Tidy "The Jungle" and "The Quest" from Gutenburg package, also few books written by Mark Twain
+Tidy and analyze "The Jungle", "The Quest of the Silver Fleece", and a few other books written by Mark Twain from Gutenburg package
